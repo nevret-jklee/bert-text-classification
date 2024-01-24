@@ -19,12 +19,7 @@ from torch.utils.data import DataLoader, random_split
 from transformers import TrainingArguments, AutoTokenizer, EarlyStoppingCallback, AutoModel, AutoConfig
 
 from custom import CustomDataset, CustomTrainer, CustomModel
-from db import fetch_target_raw_data
 from utils import get_logger, seed_everything
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 PATH = '/data/nevret/bert_ftn'
 LOGGER = get_logger()
