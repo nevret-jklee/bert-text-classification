@@ -1,10 +1,26 @@
 # bert-finetuning-custom
-bert finetuning custom
 
-## Projects
+### Introduction
+Fine-tuned a RoBERTa model for text classification using Hugging Face's Transformers library
+
+### Structure
 ```
-├── 01-Scientific-Standard-Classification
-├── 02-Data-Augmentation
-├── 03-gRPC
-└── README.md
+├── bert-text-classification
+│   ├── utils
+│   │   ├── custom.py
+│   │   ├── custom_train.py
+│   │   ├── db_info.py
+│   │   ├── eda.py
+│   │   └── utils.py
+│   ├── classify.py
+│   ├── dataset.py
+│   └── finetune.py
+├── README.md
+└── requirements.txt
 ```
+
+### Requirements
+- Python
+- PyTorch
+- Transformers
+- Scikit Learn
