@@ -12,12 +12,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader, Dataset, random_split
 from transformers import Trainer, AutoTokenizer, EarlyStoppingCallback, AutoModel, AutoConfig
 
-from db import fetch_target_raw_data
 from utils import get_logger, seed_everything
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 seed_everything(42)
 LOGGER = get_logger()

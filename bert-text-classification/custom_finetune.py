@@ -7,19 +7,18 @@ import numpy as np
 import pyarrow.parquet as pq
 
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score, f1_score
 
 from tqdm import tqdm
 from setproctitle import setproctitle
 import torch
 from torch.nn import functional as F
-from torch.optim.lr_scheduler import _LRScheduler
 from torch.utils.data import DataLoader, random_split
 from transformers import TrainingArguments, AutoTokenizer, EarlyStoppingCallback, AutoModel, AutoConfig
 
-from custom import CustomDataset, CustomTrainer, CustomModel
-from utils import get_logger, seed_everything
+from utils.custom import CustomDataset, CustomTrainer, CustomModel
+from utils.utils import *
 
 PATH = '/data/nevret/bert_ftn'
 LOGGER = get_logger()
@@ -114,7 +113,6 @@ def encoding(X_train, X_valid):
 def preprocess_data(args):
     preproc_data = pq.read_table(os.path.join(PATH + '/data/final_raw_data.parquet')).to_pandas()
 
-    # 'NA' label이 NaN으로 인식되는 것을 막기 위해
     preproc_data.loc[preproc_data['doc_section']=='NA', 'doc_section'] = 'NA_'
 
     target = 'target'

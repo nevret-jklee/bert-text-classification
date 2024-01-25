@@ -31,7 +31,7 @@ def get_config():
     p = argparse.ArgumentParser(description="Set arguments.")
     
     p.add_argument("--file_name", default="acc_final_preproc", type=str)
-    p.add_argument("--dir_path", default="/data/nevret/bert_text_classification", type=str)
+    p.add_argument("--dir_path", default="/data/nevret/bert-text-lassification/bert-text-classification", type=str)
     p.add_argument("--plm", default="klue/roberta-base", type=str, help="Pre-trained Language Model")
     
     config = p.parse_args()
@@ -46,12 +46,13 @@ def preprocess_data(config):
     
     # PREPROC_RAW_DATA
     # raw_data = get_raw_data()
-    raw_data = pq.read_table(os.path.join(config.dir_path + '/total_raw_data.parquet')).to_pandas()
+    raw_data = pq.read_table(os.path.join(config.dir_path + '/data/total_raw_data.parquet')).to_pandas()
     raw_data = raw_data[~raw_data['doc_class'].str.endswith('99')]
     raw_data = raw_data[['doc_section', 'doc_class', 'doc_subclass', 'target']]
     
     # CHATGPT AUGMENTATION DATA
-    chatgpt_data = fetch_chatgpt_aug_data()
+    chatgpt_data = pq.read_table(os.path.join(config.dir_path + '/data/chatgpt_preproc_data.parquet')).to_pandas()
+    '''
     chatgpt_data['c_top_id'].fillna('NA_', inplace=True)
     chatgpt_data = chatgpt_data[~chatgpt_data['aug_text'].isna()].reset_index(drop=True)
     chatgpt_data = chatgpt_data[['c_top_id', 'c_mid_id', 'c_sm_id', 'aug_text']].rename(columns={'c_top_id': 'doc_section', 
@@ -60,8 +61,8 @@ def preprocess_data(config):
                                                                                                  'aug_text': 'target'}).reset_index(drop=True)
     
     chatgpt_data['target'] = chatgpt_data['target'].apply(lambda text: clean_data(text))
-    chatgpt_data.to_parquet(f'/data/nevret/kistep/chatgpt_preproc_data.parquet', engine='pyarrow', compression='gzip')
-
+    '''
+    
     preproc_df = pd.concat([raw_data, chatgpt_data]).sample(frac=1).reset_index(drop=True) 
     preproc_df = preproc_df[preproc_df['target']!=''].drop_duplicates('target').dropna().reset_index(drop=True)
 
@@ -78,7 +79,7 @@ def preprocess_data(config):
     preproc_df['label'] = preproc_df['label'].astype(int)
     LOGGER.info(f"Label: {preproc_df['label'].unique()}\n")
     
-    output = open(os.path.join(config.dir_path + f'/section/data/doc_section_encoder.pkl'), 'wb')
+    output = open(os.path.join(config.dir_path + f'/data/doc_section_encoder.pkl'), 'wb')
     pickle.dump(le, output)
     output.close()
 
@@ -120,8 +121,8 @@ def preprocess_data(config):
     LOGGER.info(f'Valid data shape: {valid.shape}')
 
     # GET TRAIN, VALID, TEST
-    train.to_parquet(os.path.join(config.dir_path + f'/section/data/train_{config.file_name}.parquet'))
-    valid.to_parquet(os.path.join(config.dir_path + f'/section/data/valid_{config.file_name}.parquet'))
+    train.to_parquet(os.path.join(config.dir_path + f'/data/train_{config.file_name}.parquet'))
+    valid.to_parquet(os.path.join(config.dir_path + f'/data/valid_{config.file_name}.parquet'))
 
     print('Process finish!')
 

@@ -132,7 +132,7 @@ dmypy.json
 tensorflow_code
 
 # Models
-bert_text_classification/model
+bert-text-classification/model
 
 
 # examples
@@ -144,7 +144,7 @@ runs
 /examples/rag/sweep
 
 # data
-bert_text_classification/data
+bert-text-classification/data
 *.parquet
 *.csv
 *.pkl

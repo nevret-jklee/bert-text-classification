@@ -2,14 +2,11 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import wandb
-import pandas as pdw
+import pandas as pd
 import argparse
 import pyarrow.parquet as pq
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 import torch
-import torch.nn as nn
 from datetime import datetime
 
 from transformers import TrainingArguments, Trainer, ElectraTokenizerFast
@@ -34,9 +31,8 @@ def get_config():
     p.add_argument("--learning_rate", default=2e-5, type=float) 
     p.add_argument("--epochs", default=5, type=int)
     p.add_argument("--batch_size", default=32, type=int)
-    p.add_argument("--dir_path", default="/data/nevret/kistep/01-Scientific-Standard-Classification", type=str)
+    p.add_argument("--dir_path", default="/data/nevret/bert-finetuning-custom/bert-text-classification", type=str)
     p.add_argument("--plm", default="klue/roberta-base", type=str, help="Pre-trained Language Model")
-    p.add_argument("--model_name", default="kistep-roberta-base", type=str)
     
     config = p.parse_args()
 
@@ -62,26 +58,15 @@ def compute_metrics(pred):
 
 def train_model(config):
     current = datetime.now()
-    LOGGER = get_logger(os.path.join(config.dir_path + f'/section/logs/train_{config.file_name}'))
+    LOGGER = get_logger(os.path.join(config.dir_path + f'/logs/train_{config.file_name}'))
     LOGGER.info(current.strftime('%Y-%m-%d %H:%M:%S\n'))
     
     # setproctitle(config.process_name)
     target = 'target'
 
-    train = pq.read_table(os.path.join(config.dir_path + f'/section/data/train_{config.file_name}.parquet')).to_pandas()
-    valid = pq.read_table(os.path.join(config.dir_path + f'/section/data/valid_{config.file_name}.parquet')).to_pandas()
+    train = pq.read_table(os.path.join(config.dir_path + f'/data/train_{config.file_name}.parquet')).to_pandas()
+    valid = pq.read_table(os.path.join(config.dir_path + f'/data/valid_{config.file_name}.parquet')).to_pandas()
     
-    # AUGMENTATION DATA
-    total_aug_tmp = pd.read_csv(os.path.join(config.dir_path + '/total_tmp_aug_data.csv'))
-    total_aug_tmp = total_aug_tmp.drop_duplicates('target_aug').reset_index(drop=True)
-    total_aug_tmp = total_aug_tmp.dropna(subset=['target_aug'], axis=0)
-    total_aug_tmp[target] = total_aug_tmp['target_aug']
-
-    total_aug_tmp['length'] = total_aug_tmp[target].apply(lambda x: len(x))
-    total_aug_tmp = total_aug_tmp[total_aug_tmp['length'] > 70].reset_index(drop=True)
-
-    train = pd.concat([train, total_aug_tmp]).sample(frac=1).reset_index(drop=True)
-
     # TOKENIZER
     if config.plm == 'kykim/electra-kor-base':
         tokenizer = ElectraTokenizerFast.from_pretrained(config.plm)
@@ -91,7 +76,7 @@ def train_model(config):
     # MODEL
     model_config = AutoConfig.from_pretrained(config.plm)
     model_config.num_labels = len(train['label'].unique())
-    model = AutoModelForSequenceClassification.from_pretrained(config.plm, config=model_config).to(device)    # .cuda()
+    model = AutoModelForSequenceClassification.from_pretrained(config.plm, config=model_config).to(device)
     
     LOGGER.info(f'PLM: \n{config.plm}\n')
     LOGGER.info(f'Model: \n{model}\n')
@@ -136,7 +121,7 @@ def train_model(config):
     )
 
     args = TrainingArguments(
-        output_dir=f"{config.dir_path}/section/{wandb_name}",
+        output_dir=f"{config.dir_path}/{wandb_name}",
         num_train_epochs=config.epochs,
         per_device_train_batch_size=config.batch_size,
         per_device_eval_batch_size=config.batch_size,
@@ -160,8 +145,7 @@ def train_model(config):
     # Training
     trainer.train()
     
-    model.save_pretrained(os.path.join(config.dir_path+f'/section/model/{wandb_name}'))
-    print('')
+    model.save_pretrained(os.path.join(config.dir_path+f'/result_{wandb_name}'))
 
 
 if __name__ == '__main__':

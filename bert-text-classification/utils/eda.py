@@ -55,12 +55,11 @@ def text_aug(sentence, alpha_rs = 0.1, num_aug=3):
 
     return augmented_sentences
 
-
 def eda():
     # bot = [26, 21, 31, 25, 9, 12, 10, 32, 11, 28, 27, 24, 29, 22, 30]
     bot = [22, 27, 28, 29, 30, 32]
 
-    train = pq.read_table('').to_pandas()
+    train = pq.read_table('total_raw_data.parquet').to_pandas()
     bot_data = train[train['label'].isin(bot)]
     
     aug = bot_data['target'].apply(lambda x: text_aug(x))

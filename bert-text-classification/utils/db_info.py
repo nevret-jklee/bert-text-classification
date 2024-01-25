@@ -5,34 +5,14 @@ import re
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 
-# db_id = r'ID'
-# db_pw = r'PW'
-# db_url = r'IP'
-# db_port = 'PORT'
-# db_nm = r'DB_NM'
-
-# tmp_str = fr'{db_id}:{db_pw}@{db_url}:{db_port}/{db_nm}'
-# engine = create_engine(f'mysql+pymysql://{tmp_str}')
-
-db_id = r'anal'
-db_pw = r'anal123'
-db_url = r'172.7.0.19'
-db_port = 3306
-db_nm = r'jkdb'
+db_id = r'ID'
+db_pw = r'PW'
+db_url = r'IP'
+db_port = 'PORT'
+db_nm = r'DB_NM'
 
 tmp_str = fr'{db_id}:{db_pw}@{db_url}:{db_port}/{db_nm}'
-conn_str = f'mysql://{tmp_str}'
 engine = create_engine(f'mysql+pymysql://{tmp_str}')
-
-_db_id = r'limenet'
-_db_pw = r'euclid1234'
-_db_url = r'172.7.0.4'
-_db_port = 3307
-_db_nm = r'limenet'
-
-_tmp_str = fr'{_db_id}:{_db_pw}@{_db_url}:{_db_port}/{_db_nm}'
-_engine = create_engine(f'mysql+pymysql://{_tmp_str}')
-
 
 FN = '_acc_final_preproc' 
 
@@ -48,7 +28,7 @@ def read_rsch_df() -> pd.DataFrame:
             FROM limenet.sci_standard_index
     """
     # aug_df = pd.read_sql(sql=_q, con=engine)
-    aug_df = pd.read_sql(sql=text(_q), con=_engine.connect())
+    aug_df = pd.read_sql(sql=text(_q), con=engine.connect())
 
     return aug_df
 
@@ -64,7 +44,7 @@ def read_rsch_chatgpt_df() -> pd.DataFrame:
             FROM limenet.sci_standard_index_rsch_appl
     """
     # aug_df = pd.read_sql(sql=_q, con=engine)
-    aug_df = pd.read_sql(sql=text(_q), con=_engine.connect())
+    aug_df = pd.read_sql(sql=text(_q), con=engine.connect())
 
     return aug_df
 
@@ -108,16 +88,6 @@ def fetch_target_player() -> pd.DataFrame:
     :return: raw dataframe
 
     """
-    db_id = r'limenet_anal'
-    db_pw = r'limenetDB1234$'
-    db_url = r'10.200.7.18'
-    db_port = 3306
-    db_nm = r'kistep_dm'
-
-    tmp_str = fr'{db_id}:{db_pw}@{db_url}:{db_port}/{db_nm}'
-    conn_str = f'mysql://{tmp_str}'
-    engine = create_engine(f'mysql+pymysql://{tmp_str}')
-
     _q = """
         SELECT * 
             FROM kistep_dm.player;
