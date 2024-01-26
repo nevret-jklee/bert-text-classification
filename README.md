@@ -1,7 +1,7 @@
-# bert-finetuning-custom
+# bert-text-classification
 
 ### Introduction
-Fine-tuned a RoBERTa model for text classification using Hugging Face's Transformers library
+Fine-tuned a klue/roberta model for text classification using Hugging Face's Transformers library
 
 ### Structure
 ```

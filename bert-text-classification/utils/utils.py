@@ -52,6 +52,24 @@ def clean_data(raw_text):
     # join 후 공백 제거
     return ' '.join(text).strip()
 
+def compute_metrics(pred):
+    from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
+
+    labels = pred.label_ids
+    preds = pred.predictions.argmax(-1)
+    precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
+
+    acc = accuracy_score(labels, preds)
+    # auc = roc_auc_score(labels, preds)
+
+    return {
+        'accuracy': acc,
+        'f1': f1,
+        'precision': precision,
+        'recall': recall,
+        # 'auroc': auc
+    }
+
 def get_logger(filename='./train'):
     from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
     logger = getLogger(__name__)

@@ -38,24 +38,6 @@ def get_config():
 
     return config
 
-def compute_metrics(pred):
-    from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
-
-    labels = pred.label_ids
-    preds = pred.predictions.argmax(-1)
-    precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='weighted')
-
-    acc = accuracy_score(labels, preds)
-    # auc = roc_auc_score(labels, preds)
-
-    return {
-        'accuracy': acc,
-        'f1': f1,
-        'precision': precision,
-        'recall': recall,
-        # 'auroc': auc
-    }
-
 def train_model(config):
     current = datetime.now()
     LOGGER = get_logger(os.path.join(config.dir_path + f'/logs/train_{config.file_name}'))
@@ -90,7 +72,7 @@ def train_model(config):
         padding='max_length',
         truncation=True,
         add_special_tokens=True,
-    )    
+    )
 
     tokenized_valid = tokenizer(
         # [' '.join(valid[target][i]) for i in range(len(valid[target]))],
