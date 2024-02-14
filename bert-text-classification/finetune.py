@@ -27,12 +27,13 @@ def get_config():
     p = argparse.ArgumentParser(description="Set arguments.")
 
     p.add_argument("--file_name", default="acc_final_preproc", type=str)
+    p.add_argument("--plm", default="klue/roberta-base", type=str, help="Pre-trained Language Model")
+    p.add_argument("--dir_path", default="/data/nevret/bert-finetuning-custom/bert-text-classification", type=str)
+    
     p.add_argument("--seed", default="42", type=int)
     p.add_argument("--learning_rate", default=2e-5, type=float) 
     p.add_argument("--epochs", default=5, type=int)
     p.add_argument("--batch_size", default=32, type=int)
-    p.add_argument("--dir_path", default="/data/nevret/bert-finetuning-custom/bert-text-classification", type=str)
-    p.add_argument("--plm", default="klue/roberta-base", type=str, help="Pre-trained Language Model")
     
     config = p.parse_args()
 
@@ -128,6 +129,7 @@ def train_model(config):
     trainer.train()
     
     model.save_pretrained(os.path.join(config.dir_path+f'/result_{wandb_name}'))
+
 
 
 if __name__ == '__main__':
